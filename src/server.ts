@@ -3,13 +3,12 @@ import { Server } from "http";
 import mongoose from "mongoose";
 import app from "./app";
 import { envVars } from "./app/config/env";
+import { seedSuperAdmin } from "./app/utils/seedSuperAdmin";
 
 let server: Server;
 
-
 const startServer = async () => {
   try {
-    
     await mongoose.connect(envVars.DB_URL);
     console.log("connect to DB!!");
     server = app.listen(envVars.PORT, () => {
@@ -20,7 +19,10 @@ const startServer = async () => {
   }
 };
 
-startServer();
+(async () => {
+  await startServer();
+  await seedSuperAdmin();
+})();
 
 process.on("SIGTERM", () => {
   console.log("Sigterm signal recived.....  Server Shutting Down");
