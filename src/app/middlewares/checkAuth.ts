@@ -1,55 +1,48 @@
 import { NextFunction, Request, Response } from "express";
-import AppError from "../errorHelpers/AppError";
-import { verifyToken } from "../utils/jwt";
-import { envVars } from "../config/env";
-import { JwtPayload } from "jsonwebtoken";
-import { User } from "../modules/user/user.model";
 import httpStatus from "http-status-codes";
+import { JwtPayload } from "jsonwebtoken";
+import { envVars } from "../config/env";
+import AppError from "../errorHelpers/AppError";
 import { isActive } from "../modules/user/user.interface";
+import { User } from "../modules/user/user.model";
+import { verifyToken } from "../utils/jwt";
 
-export const checkAuth =
-  (...authRoles: string[]) =>
-  async (req: Request, res: Response, next: NextFunction) => {
+export const checkAuth = (...authRoles: string[]) => async (req: Request, res: Response, next: NextFunction) => {
+
     try {
-      const accessToken = req.headers.authorization;
+        const accessToken = req.headers.authorization;
 
-      if (!accessToken) {
-        throw new AppError(403, "No token Recived");
-      }
+        if (!accessToken) {
+            throw new AppError(403, "No Token Recieved")
+        }
 
-      const verifedToken = verifyToken(
-        accessToken,
-        envVars.JWT_ACCESS_SECRET
-      ) as JwtPayload;
 
-      const isUserExist = await User.findOne({ email: verifedToken.email });
+        const verifiedToken = verifyToken(accessToken, envVars.JWT_ACCESS_SECRET) as JwtPayload
 
-      if (!isUserExist) {
-        throw new AppError(httpStatus.BAD_REQUEST, "User does not exist");
-      }
+        const isUserExist = await User.findOne({ email: verifiedToken.email })
 
-      if (
-        isUserExist.isActive === isActive.BLOCKED ||
-        isUserExist.isActive === isActive.INACTIVE
-      ) {
-        throw new AppError(
-          httpStatus.BAD_REQUEST,
-          "User is blocked or Inastive"
-        );
-      }
+        if (!isUserExist) {
+            throw new AppError(httpStatus.BAD_REQUEST, "User does not exist")
+        }
+        if (!isUserExist.isVerified) {
+            throw new AppError(httpStatus.BAD_REQUEST, "User is not verified")
+        }
+        if (isUserExist.isActive === isActive.BLOCKED || isUserExist.isActive === isActive.INACTIVE) {
+            throw new AppError(httpStatus.BAD_REQUEST, `User is ${isUserExist.isActive}`)
+        }
+        if (isUserExist.isDeleted) {
+            throw new AppError(httpStatus.BAD_REQUEST, "User is deleted")
+        }
 
-      if (isUserExist.isDeleted) {
-        throw new AppError(httpStatus.BAD_REQUEST, "User is Deleted");
-      }
+        if (!authRoles.includes(verifiedToken.role)) {
+            throw new AppError(403, "You are not permitted to view this route!!!")
+        }
+        req.user = verifiedToken
+        next()
 
-      if (!authRoles.includes(verifedToken.role)) {
-        throw new AppError(403, "You are not permited to view this route");
-      }
-
-      req.user = verifedToken;
-
-      next();
     } catch (error) {
-      next(error);
+        // eslint-disable-next-line no-console
+        console.log("jwt error", error);
+        next(error)
     }
-  };
+}
