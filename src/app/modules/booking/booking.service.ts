@@ -10,10 +10,9 @@ import { Tour } from "../tour/tour.model";
 import { SSLService } from "../sslCommerz/sslCommerz.service";
 // import { any } from "zod";
 import { ISSLCommerz } from "../sslCommerz/sslCommerz.interface";
+import { getTransactionId } from "../../utils/getTransactionId";
 
-const getTransactionId = () => {
-  return `tran_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-};
+
 
 /**
  * Transaction roll back
