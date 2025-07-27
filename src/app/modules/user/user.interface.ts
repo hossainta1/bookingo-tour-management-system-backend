@@ -27,7 +27,7 @@ export interface IAuthProvider {
 }
 
 export interface IUser {
-  _id ?: Types.ObjectId;
+  _id?: Types.ObjectId;
   name: string;
   email: string;
   password?: string;
@@ -41,4 +41,5 @@ export interface IUser {
   auths: IAuthProvider[];
   bookings?: Types.ObjectId[];
   guides?: Types.ObjectId[];
+  createdAt?: Date;
 }

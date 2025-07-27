@@ -45,23 +45,23 @@ export const updateUserZodSchema = z.object({
     .min(2, { message: "Name too Short. Minimum 2 character long " })
     .max(50, { message: "Name to long" })
     .optional(),
-  password: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters long." })
-    .regex(/(?=.*[A-Z])/, {
-      message: "Password must contain at least 1 uppercase letter.",
-    })
-    .regex(/(?=.*[a-z])/, {
-      message: "Password must contain at least 1 lowercase letter.",
-    })
-    .regex(/(?=.*\d)/, {
-      message: "Password must contain at least 1 number.",
-    })
-    // eslint-disable-next-line no-useless-escape
-    .regex(/(?=.*[!@#$%^&*(),.?":{}|<>[\]\\\/\-_=+`~])/, {
-      message: "Password must contain at least 1 special character.",
-    })
-    .optional(),
+  // password: z
+  //   .string()
+  //   .min(8, { message: "Password must be at least 8 characters long." })
+  //   .regex(/(?=.*[A-Z])/, {
+  //     message: "Password must contain at least 1 uppercase letter.",
+  //   })
+  //   .regex(/(?=.*[a-z])/, {
+  //     message: "Password must contain at least 1 lowercase letter.",
+  //   })
+  //   .regex(/(?=.*\d)/, {
+  //     message: "Password must contain at least 1 number.",
+  //   })
+  //   // eslint-disable-next-line no-useless-escape
+  //   .regex(/(?=.*[!@#$%^&*(),.?":{}|<>[\]\\\/\-_=+`~])/, {
+  //     message: "Password must contain at least 1 special character.",
+  //   })
+  //   .optional(),
   phone: z
     .string({ invalid_type_error: "Phone number must be a string" })
     .regex(/^(?:\+8801\d{9}|01\d{9})$/, {
